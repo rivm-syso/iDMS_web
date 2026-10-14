@@ -60,7 +60,9 @@ def irodssessions():
         { "field": "Environment", "title": "Environment", "sortable": True },
         { "field": "User", "title": "User", "sortable": True },
         { "field": "State", "title": "State", "sortable": True },
-        { "field": "Timestamp", "title": "Last use", "sortable": True },        
+        { "field": "Timestamp", "title": "Last use", "sortable": True },
+        { "field": "Active_timeout", "title": "Active timeout", "sortable": True},
+        { "field": "Idle_timeout", "title": "Idle timeout", "sortable": True}        
     ]
     return render_template('report_irodssessions.html', columns=columns)
 

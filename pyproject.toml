@@ -39,7 +39,7 @@ dependencies = [
    "jsonschema",
    "irods_avu_json",
    "werkzeug",
-   "idms-common-irods>=0.0.8",
+   "idms-common-irods>=evw_configure_timeout",
    "idms-common-filesys>=0.0.3",
    "idms-common-constants>=0.0.5"
 ]

@@ -50,6 +50,8 @@ LOGCONFIG = {
 
 # This is the max file upload size in MB
 MAX_FILE_UPLOAD_SIZE=20000
+# This is the timeout for the upload irods session
+UPLOAD_TIMEOUT = 3600
 
 IRODS_ENVS = {
     'Productie':   {
