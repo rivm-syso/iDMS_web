@@ -8,7 +8,7 @@ import shutil
 import logging
 import time
 import jsonavu
-from flask import Blueprint, render_template, redirect, request, url_for, flash
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app
 from flask_login import current_user, login_required
 from idms.web.app.utils.datafield import datafield, Datatypes
 from idms.web.app.utils.projectdb_api import rest_call
@@ -282,7 +282,7 @@ def upload_data():
             fullPath = f.filename
         filename = os.path.join(coll, fullPath)
         filepath = os.path.dirname(filename)
-        with irods_manager.session(current_user) as session:
+        with irods_manager.session(current_user, active_timeout=current_app.config.get('UPLOAD_TIMEOUT')) as session:
             if not fs_irods(session=session).folderexists(filepath):
                 fs_irods(session=session).mkdir(filepath)
             with fs_irods(session=session).open(filename, 'w') as d:
