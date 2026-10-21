@@ -1,5 +1,6 @@
 stages:
   - test
+  - commit_history
   - build
   - internal_publish
   - release_publish
@@ -13,7 +14,7 @@ variables:
 
 commit_history:
   stage:
-    build
+    commit_history
   script:
     - export DEBIAN_FRONTEND=noninteractive
     - apt-get update && apt-get install -y python3 git
