@@ -16,3 +16,4 @@ flask_session/
 metrics/
 rjsf/node_modules/
 tmp/
+src/idms/web/app/config/commits_data.py
