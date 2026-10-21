@@ -11,6 +11,19 @@ variables:
   PYPI_INDEX_URL: "${CI_API_V4_URL}/projects/4682/packages/pypi/simple"
   INSTANCE_BRANDING_DIR: "/opt/idms_web/instance/branding"
 
+commit_history:
+  stage:
+    build
+  script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt-get update && apt-get install -y python3 git
+    - python3 tools/githistory.py --gitlab-url https://gitlab.rivm.nl --output src/idms/web/app/commits_data.py
+  artifacts:
+    paths:
+      - src/idms/web/app/commits_data.py
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
+
 include:
   # Unit testing
   #- component: $CI_SERVER_FQDN/bioinformatics/pipelines/python/unittesting@0.2.1
@@ -42,18 +55,7 @@ include:
   #      - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
 
 # Override rules on the jobs created by the components
-commit_history:
-  stage:
-    build
-  script:
-    - export DEBIAN_FRONTEND=noninteractive
-    - apt-get update && apt-get install -y python3 git
-    - python3 tools/githistory.py --gitlab-url https://gitlab.rivm.nl --output src/idms/web/app/commits_data.py
-  artifacts:
-    paths:
-      - src/idms/web/app/commits_data.py
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
+
 
 publish_package_rc:
   rules:
