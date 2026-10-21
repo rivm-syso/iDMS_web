@@ -203,7 +203,7 @@ function update_process(sourceElem, destElem) {
 
           <!-- Hidden input for form submission -->
           <input type="hidden" name="department" id="department_{{ projectdetails.name }}"
-            value="{{ projectdetails.department }}">
+            value="{{ projectdetails.department if projectdetails.department is not none  }}">
         </div>
         <div class="form-check">
           <input type="checkbox" class="form-check-input" name="public" id="public_{{ projectdetails.name }}" placeholder="Public Data"
