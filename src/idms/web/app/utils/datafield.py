@@ -87,10 +87,11 @@ class data_base(Datafield):
 @dfr.register_type(Datatypes.INT)
 class data_int(data_base):
     def __init__(self, name, value, datatype=None):
-        if str(value).isnumeric():
+        try:
             super().__init__(name, int(value), datatype)
             self.nan = False
-        else:
+        except ValueError:
+            super().__init__(name, 'NaN', datatype)
             self.nan = True
 
     def __str__(self):
