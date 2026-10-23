@@ -15,14 +15,48 @@ Uses:
 
 Start de applicatie met behulp van het script start.sh
 
-## deployment
+## debugging and deployment
 
 The application is distributed as the idms-web python-package.
 Its is referenced in the env/idms_web environment file.
 By creating and activating the environment the package is made available and the flask server can be started locally using:
+
    start.sh
 
-When deploying on a server we use a docker-image containing the conda environment.
+You can also activate the environment and then install the python packages from our internal package repository:
+
+   conda activate idms_web
+   pip install --extra-index-url https://gitlab.rivm.nl/api/v4/projects/4682/packages/pypi/simple --no-build-isolation -e .
+
+When deploying on a production server we use a docker-image containing the conda environment.
+
+To debug the application  in visual studio, first activate the idms_web environment and then use a launch configuration like this:
+
+   {
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Flask Package",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "idms.web:create_app",
+        "FLASK_DEBUG": "1",
+        "PYTHONPATH": "${workspaceFolder}",
+        "FLASK_INSTANCE_PATH": "${workspaceFolder}/instance"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload"
+      ],
+      "jinja": true
+    }
+  ]
+  }
+
+
 
 
 
