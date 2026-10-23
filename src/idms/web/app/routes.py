@@ -40,24 +40,14 @@ def msgconfirm():
 @bp.route('/about')
 def about():
     idms_web_details = {}
-    idms_web_commit = subprocess.check_output(["git", "show", "HEAD"]).strip().decode('utf-8')
-    for line in idms_web_commit.splitlines():
-        fields = line.split(' ')
-        if fields[0]:
-            idms_web_details[fields[0].split(':')[0].lower()] = ' '.join(fields[1:]).strip()
-    idms_web_log = subprocess.check_output(["git", "log", '--pretty=format:%h %ad %s', "--date=short", '--since="4 weeks ago"', '--no-merges']).strip().decode('utf-8')
-    idms_web_history = []
-    for line in idms_web_log.splitlines():
-        fields = line.split(' ')
-        idms_web_history.append(
-            {'commit': fields[0],
-             'date': fields[1],
-             'message': ' '.join(fields[2:])
-             })   
-    idms_web_details['branch'] = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).strip().decode('utf-8')
+    # Try reading the commits data file
+    try:
+        from idms.web.app.config.commits_data import COMMITS
+    except:
+        COMMITS = []
     with irods_manager.session(current_user) as session:
         irods_version = '.'.join(map(str, session.server_version))
-    return render_template('about.html', irods_version=irods_version, idms_web_details=idms_web_details, idms_web_history=idms_web_history)
+    return render_template('about.html', irods_version=irods_version, idms_web_history=COMMITS)
 
 
 @bp.route('/settings')
