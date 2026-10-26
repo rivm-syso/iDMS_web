@@ -59,5 +59,9 @@ docs = [
 where = ["src"]
 include = ["idms*"]
 
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+
 [project.scripts]
 idms-web = "idms.web.wsgi:main"
