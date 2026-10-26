@@ -43,8 +43,9 @@ include:
     inputs:
       job_name: publish_package_rc
       stage: internal_publish
-  #    rules:
-  #      - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+-rc\.\d+$/
+      username: oauth2
+      password: $PUBLISH_TOKEN
+      publish_url: ${CI_API_V4_URL}/projects/4682/packages/pypi
   # Build and release package
   - component: $CI_SERVER_FQDN/bioinformatics/pipelines/python/publish_package@0.2.1
     inputs:
