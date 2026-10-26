@@ -60,8 +60,9 @@ where = ["src"]
 include = ["idms*"]
 
 [tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "node-and-date"
+# Don't use local version
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
 
 [project.scripts]
 idms-web = "idms.web.wsgi:main"
