@@ -63,11 +63,11 @@ build_package:
     - job: commit_history
       optional: true  # Prevents pipeline failure if rules skip commit_history on untagged commits
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\d+)?$/
 
 publish_package_rc:
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+-rc\.\d+$/
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+-rc\d+$/
 
 publish_package_pr:
   rules:
