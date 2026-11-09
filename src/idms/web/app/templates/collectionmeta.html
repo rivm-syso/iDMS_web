@@ -1,0 +1,30 @@
+{% import 'components/metadata_editor.html' as metadata_widget %}
+
+{% extends 'collectiondetailsmenu.html' %}
+
+{% block heading %}
+<h3><b>Collection metadata for:</b><a href="{{ url_for('collbrowser.collbrowser', collection=collection) }}">
+    {{ collection }}
+</a>  </h3>
+{% endblock %}
+
+{% block menuname %}
+menuname='collmetaedit'
+{% endblock %}
+
+{% block content %}
+    <div class="tab-pane h-100" id="projectmeta" role="tabpanel" aria-labelledby="metaedit_button">
+      {{
+        metadata_widget.render_metadata_editor(
+          id="comp_dataset_metadata_" + name,
+          prefix=prefix,
+          project_name=project,
+          collection=collection,
+          meta_default_values_collection=meta_default_values_collection,
+          edit_allowed=edit_allowed,
+          schemata_data_url=url_for('metaedit.schemata_for_dataset_editmeta', collection=collection, project_name=project),
+          attribute_type=attribute_type
+          )
+      }}
+    </div>
+{% endblock %}

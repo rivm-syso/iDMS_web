@@ -28,13 +28,26 @@ var jsontree_loaded = false;
                     aria-controls="collmeta-raw">Raw Metadata</a>
             </li>
             <li class="nav-item mx-2">
-                <a class="nav-link {% if object_avu |length == 0 %} disabled {% endif %}"
+                <a class="nav-link {% if object_avu | length == 0 %} disabled {% endif %}"
                     id="objectmeta-tab"
                     data-toggle="tab"
                     href="#objectmeta"
                     role="tab"
                     aria-controls="objectmeta">Object Metadata</a>
             </li>
+
+            {% if edit_allowed %}
+            <li class="nav-item mx-2">
+                <a  href="{{ url_for('metaedit.metadata_editor', 
+                            collection=collection, 
+                            project=project, 
+                            edit_allowed=edit_allowed) 
+                            }}" 
+                    class="btn btn-primary">
+                    Edit Metadata
+                </a>
+            </li>
+            {% endif %}
         </ul>
     </div>
     {% if current_user.settings.get('sysmeta', 'true') == 'false' %}

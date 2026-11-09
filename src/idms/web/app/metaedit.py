@@ -2,9 +2,10 @@ import os
 import json
 import jsonavu
 import logging
-from flask import Blueprint, request, jsonify, current_app
+from flask import render_template, Blueprint, request, jsonify, current_app
 from flask_login import current_user
 from idms.web.app.utils import cached_iqry
+from idms.web.app.utils.projectdb_api import rest_call
 from idms.common.constants.attribute_names import (
                             ATTR_SCHEMA_IN_USE,
                             ATTR_PROJECT_SUFFIX,
@@ -75,10 +76,32 @@ def get_schemata( schema_collection ):
     return result
 
 
-@bp.route('/')
-# def metadata_editor():
-#     schema_endpoint = url_for('metaedit.schemata')
-#     return render_template('metadata_editor.html', **request.args)
+@bp.route('/metadata_editor')
+def metadata_editor(): 
+    collection = request.args.get("collection", '', type=str)
+    project = request.args.get('project')
+    edit_allowed = request.args.get('edit_allowed', False)
+    project_details, _ = rest_call('GET', 'projects/{}'.format(project))
+    prefix = ATTR_METADATA_PREFIX
+    attribute_type=ATTR_SCHEMA_IN_USE + ATTR_DATASET_UPLOAD_SUFFIX
+    name = os.path.basename(collection)
+    meta_default_values_collection = project_details.get('default_collection', '')
+    metadata = cached_iqry.qcollmeta(collection) #the typed version tries reading the unit field as a python type
+    metadict = cached_iqry.qcollmetadict(collection)
+    avudata = [ { 'a': avu[CollectionMeta.name][len(ATTR_UPLOADMETA):], 'v': avu[CollectionMeta.value], 'u': avu[CollectionMeta.units] } for avu in metadata if avu[CollectionMeta.name].startswith(ATTR_METADATA_PREFIX) ]
+    data = jsonavu.avu2json(avudata, AVU2JSON_PREFIX)
+    selectedSchema = metadict.get(ATTR_SCHEMA_IN_USE + ATTR_DATASET_UPLOAD_SUFFIX, None)     
+    return render_template('collectionmeta.html',
+                            name=name, 
+                            collection=collection, #Same collection, but the meta-edit-component expects the collection to be called 'collection'
+                            meta_default_values_collection=meta_default_values_collection, 
+                            project=project, 
+                            selectedSchema=selectedSchema, 
+                            prefix=prefix,
+                            data=data, 
+                            attribute_type=attribute_type,
+                            edit_allowed=edit_allowed
+                            )
 
 
 @bp.route('/schemata_project')
@@ -104,6 +127,16 @@ def schemata_for_dataset_upload():
     suffix=ATTR_DATASET_UPLOAD_SUFFIX
     return schemata(meta_schemata_collection, meta_values_collection, prefix, suffix)
 
+@bp.route('/schemata_dataset_editmeta')
+def schemata_for_dataset_editmeta():
+    """ Schemata for a dataset when editing metadata
+    """
+    project_name = request.args.get('project_name', '')
+    meta_schemata_collection = Path('/', current_user.irods_zone, schemaPaths('SCHEMATA_BASE_PATH'), schemaPaths('DATASET_SCHEMATA_PATH'), project_name)
+    meta_values_collection = request.args.get('collection')
+    prefix=ATTR_METADATA_PREFIX
+    suffix=ATTR_DATASET_UPLOAD_SUFFIX
+    return schemata(meta_schemata_collection, meta_values_collection, prefix, suffix)
 
 @bp.route('/schemata_dataset_default')
 def schemata_for_dataset_default():

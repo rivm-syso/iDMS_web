@@ -32,10 +32,11 @@
   </div>
   <div class="card selectdetail">
     <div class="card-header">
-      <div class="card-title"><b>Metadata Editor</b></div>
-
-      <!-- for testing, uncomment these
-        <h5 class="mt-5"><b>ID: </b>{{ id }}</h5>
+      <div class="card-title"><h1><b>Metadata Editor</b></h1>
+      </div>
+      <!-- for testing, uncomment these  
+      <div style="clear: both">
+        <h5><b>ID: </b>{{ id }}</h5>
         <h5><b>Prefix for metadata: </b>{{ prefix }}</h5>
         <h5><b>Project Name: </b>{{ project_name }}</h5>
         <h5><b>Collection to store values on: </b>{{ collection }}</h5>
@@ -43,8 +44,8 @@
         <h5><b>edit_allowed: </b>{{ edit_allowed }}</h5>
         <h5><b>data url to get schemata: </b>{{ schemata_data_url }}</h5>
         <h5><b>attribute type: </b>{{ attribute_type }}</h5>
+      </div> 
       -->
-
     </div>
     <div class="card-body">
       <div id="{{ id }}-schema-error" class="alert alert-danger" style="display: none; white-space: pre-line;"></div>

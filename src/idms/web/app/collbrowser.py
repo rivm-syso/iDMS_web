@@ -175,7 +175,7 @@ def coll_meta():
     path = request.args.get('path', '/', type=str)
     selected_object = request.args.get('selected_object', '', type=str)
     tabname = current_user.settings.get('metatab', 'collmeta-tab')
-
+                              
 # Query for collection metadata
     coll_avu = []
     query = cached_iqry.qcollmeta(path)
@@ -185,7 +185,19 @@ def coll_meta():
         units = coll_metadata[CollectionMeta.units]
         if current_user.settings.get('sysmeta', 'true') == "true" or not name.startswith('sys::'):
             coll_avu.append(AVU2data(name, value, units))
-            
+
+    # Allow metadata editing only for DATASETS in <zone>/projects, if you are MANAGER of the project
+    dataset_id = cached_iqry.qcollmetaval(path, ATTR_DATASETID, '')
+    project = cached_iqry.qcollmetaval(path, ATTR_PROJECTID, '')
+    # Only folders in a project
+    subfolder = path.count('/') > 3
+
+    if project and dataset_id and subfolder:
+        project_permissions=projects.project_permissions(project)
+        edit_allowed=project_permissions['managers']
+    else:
+        edit_allowed = False
+
     json_data = get_collection_metadata_structured(path, ATTR_METADATA_PREFIX)
     json_data_display = { format_schema_name(schema): metadata for schema, metadata in json_data.items()}
     
@@ -201,7 +213,15 @@ def coll_meta():
             units = object_metadata[DataObjectMeta.units]
             if current_user.settings.get('sysmeta', 'true') == "true" or not name.startswith('sys::'):
                 object_avu.append(AVU2data(name, value, units))
-    return render_template('metadata.html', coll_avu=coll_avu, object_avu=object_avu, json_data=json_data_display, tabname=tabname)
+    return render_template('metadata.html', 
+                                collection=path, 
+                                project=project,
+                                edit_allowed=edit_allowed,
+                                coll_avu=coll_avu, 
+                                object_avu=object_avu, 
+                                json_data=json_data_display, 
+                                tabname=tabname
+                                )
 
 @bp.route('_setKeepOnlineUntil', methods=['GET'])
 def setKeepOnlineUntil():
