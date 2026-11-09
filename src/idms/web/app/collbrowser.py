@@ -189,8 +189,9 @@ def coll_meta():
     # Allow metadata editing only for DATASETS in <zone>/projects, if you are MANAGER of the project
     dataset_id = cached_iqry.qcollmetaval(path, ATTR_DATASETID, '')
     project = cached_iqry.qcollmetaval(path, ATTR_PROJECTID, '')
-    # Only folders in a project
-    subfolder = path.count('/') > 3
+    # exclude the root project path and check for /<project>/ in path
+    # TODO make it look ate the configured path to store projects
+    subfolder = ('/' + project + '/') in path
 
     if project and dataset_id and subfolder:
         project_permissions=projects.project_permissions(project)
