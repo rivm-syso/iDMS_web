@@ -31,7 +31,6 @@ from idms.common.constants.attribute_names import (
         ATTR_UPLOADSETTINGS ,
         ATTR_UPLOADMETA, 
         ATTR_SCHEMA_IN_USE,
-        ATTR_DATASET_DEFAULT_SUFFIX,
         ATTR_DATASET_UPLOAD_SUFFIX,
         META_SUFFIXLENGTH,
         AVU2JSON_PREFIX
@@ -238,9 +237,9 @@ def upload_meta():
             meta_default_values_collection = project_details.get('default_collection', '')
         
         metadata = cached_iqry.qcollmeta(collection) #the typed version tries reading the unit field as a python type
-        metadict = cached_iqry.qcollmetadict(collection)
         avudata = [ { 'a': avu[CollectionMeta.name][len(ATTR_UPLOADMETA):], 'v': avu[CollectionMeta.value], 'u': avu[CollectionMeta.units] } for avu in metadata if avu[CollectionMeta.name].startswith(ATTR_UPLOADMETA) ]
         data = jsonavu.avu2json(avudata, AVU2JSON_PREFIX)
+
         metadict = cached_iqry.qcollmetadict(collection) # no unit here, not needed
         selectedSchema = metadict.get(ATTR_SCHEMA_IN_USE + ATTR_DATASET_UPLOAD_SUFFIX, None)     
         prefix=ATTR_UPLOADMETA   

@@ -16,3 +16,5 @@ flask_session/
 metrics/
 rjsf/node_modules/
 tmp/
+src/idms_web.egg-info/*
+.vscode/*

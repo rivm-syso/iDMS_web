@@ -1,0 +1,11 @@
+{% extends 'base2.html' %}
+
+{% block menuitems %}
+<li class="nav-header bg-warning text-center">COLLECTION DETAILS</li>
+<li class="nav-item">
+    <a href="{{ url_for('metaedit.metadata_editor') }}" class="nav-link" data-menuname='collmetaedit'>
+        <i class="fas fa-sliders-h nav-icon"></i>
+        <p>Metadata</p>
+    </a>
+</li>
+{% endblock %}
