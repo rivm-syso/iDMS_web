@@ -6,6 +6,11 @@
   // edit_allowed can be a string or a boolean, for uniform handling:
   {% set edit_allowed = edit_allowed|string|lower %}
 </script>
+             
+<!-- Spinner overlay -->
+<div id="loading-spinner" style="display:none;">
+  <div class="spinner"></div>
+</div>
 
 <div class="selectgrid h-100">
   <div class="card selectlist">
@@ -127,7 +132,15 @@
       .hide()
       .text('');
   }
-  
+
+    // --- Simple spinner helpers ---
+  function showSpinner() {
+      document.getElementById("loading-spinner").style.display = "block";
+  }
+  function hideSpinner() {
+      document.getElementById("loading-spinner").style.display = "none";
+  }
+
   function handleFormError(error) {
     const errorMessage = error
       .map(error => error.stack || error.message || String(error))
@@ -399,6 +412,7 @@
       action: formaction
     },   
     // store metadata
+    showSpinner();
     $.ajax({
     method: "POST",
     url: '{{ url_for("metaedit.store_metadata") }}',
@@ -413,6 +427,7 @@
       if (formaction === 'continue') {
         window.location.replace('{{ url_for("upload.upload_data", coll=collection) }}');
       }
+      hideSpinner()
     },
     error: function () {
     }
