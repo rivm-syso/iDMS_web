@@ -23,7 +23,8 @@ from pathlib import Path
 
 bp = Blueprint('metaedit', __name__, url_prefix='/metaedit')
 
-def schemaPaths(name):
+
+def schemaPaths(name: str) -> str:
     defaults = {
         'SCHEMATA_BASE_PATH': 'system/schemata',
         'DATASET_SCHEMATA_PATH': 'datasets',
@@ -34,6 +35,7 @@ def schemaPaths(name):
         return current_app.config.get(name, defaults[name])
     raise AttributeError
 
+
 def get_schemata( schema_collection ):
     """ Return list of all schemata from the leaf down to the base collection
         as a dictionary:
@@ -42,7 +44,7 @@ def get_schemata( schema_collection ):
             TODO: what if the same name is on different levels
         }
     """
-    def get_schemata_in_coll( coll ):
+    def get_schemata_in_coll(coll):
         result = {}
         for obj in coll.data_objects:
 
@@ -90,6 +92,7 @@ def schemata_for_project():
     suffix=ATTR_PROJECT_SUFFIX
     return schemata(meta_schemata_collection, meta_values_collection, prefix, suffix)
 
+
 @bp.route('/schemata_dataset_upload')
 def schemata_for_dataset_upload():
     """ Schemata for a dataset upload
@@ -101,6 +104,7 @@ def schemata_for_dataset_upload():
     suffix=ATTR_DATASET_UPLOAD_SUFFIX
     return schemata(meta_schemata_collection, meta_values_collection, prefix, suffix)
 
+
 @bp.route('/schemata_dataset_default')
 def schemata_for_dataset_default():
     """ Schemata for a dataset, available as default metadata, used in a dataset upload
@@ -111,6 +115,7 @@ def schemata_for_dataset_default():
     prefix=ATTR_UPLOAD_DEFAULT_PREFIX
     suffix=ATTR_DATASET_DEFAULT_SUFFIX
     return schemata(meta_schemata_collection, meta_values_collection, prefix, suffix)
+
 
 @bp.route('/schemata_reference')
 def schemata_for_reference_dataset():
@@ -180,6 +185,7 @@ def store_metadata():
         logging.error(f'Not allowed to edit this metadata: {e}')
         return jsonify({}), 500
 
+
 @bp.route('_set_schemata_for_collection', methods=['POST'])
 def set_schemata_for_collection():
     """ Store the schemata used on the collection with
@@ -220,7 +226,6 @@ def set_schemata_for_collection():
 
 
 def remove_all_constraints(schema_json :dict) ->dict:
-
     '''
     Recursively remove all `required` constraints from a JSON Schema.
     Also set minItems to 0.
@@ -473,4 +478,4 @@ def store_collection_metadata_structured(collection, data, schemapath, prefix):
     for avu in jsonavu_metadata:
         # prevent saving of unwanted residual schema name, if on json top level all schemata are unchecked
         if avu['u'] != f'{AVU2JSON_PREFIX}_0_z':
-            cached_iqry.scollmetaval(collection, f"{prefix}{avu['a']}", avu['v'], avu['u'])
+            cached_iqry.addcollmetaval(collection, f"{prefix}{avu['a']}", avu['v'], avu['u'])
