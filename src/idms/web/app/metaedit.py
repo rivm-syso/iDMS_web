@@ -509,6 +509,9 @@ def store_collection_metadata_structured(collection, data, schemapath, prefix):
     jsonavu_metadata = jsonavu.json2avu(existing_data, AVU2JSON_PREFIX)
     remove_collection_metadata(collection, prefix)
     for avu in jsonavu_metadata:
+        
         # prevent saving of unwanted residual schema name, if on json top level all schemata are unchecked
-        if avu['u'] != f'{AVU2JSON_PREFIX}_0_z':
-            cached_iqry.addcollmetaval(collection, f"{prefix}{avu['a']}", avu['v'], avu['u'])
+        if avu['u'] == f'{AVU2JSON_PREFIX}_0_z':
+            continue
+        
+        cached_iqry.addcollmetaval(collection, f"{prefix}{avu['a']}", avu['v'], avu['u'])
