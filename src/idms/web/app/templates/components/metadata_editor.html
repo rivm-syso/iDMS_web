@@ -33,8 +33,8 @@
   <div class="card selectdetail">
     <div class="card-header">
       <div class="card-title"><b>Metadata Editor</b></div>
-      
-      <!-- for testing, uncomment these   
+
+      <!-- for testing, uncomment these
         <h5 class="mt-5"><b>ID: </b>{{ id }}</h5>
         <h5><b>Prefix for metadata: </b>{{ prefix }}</h5>
         <h5><b>Project Name: </b>{{ project_name }}</h5>
@@ -43,8 +43,8 @@
         <h5><b>edit_allowed: </b>{{ edit_allowed }}</h5>
         <h5><b>data url to get schemata: </b>{{ schemata_data_url }}</h5>
         <h5><b>attribute type: </b>{{ attribute_type }}</h5>
-     --> 
-      
+      -->
+
     </div>
     <div class="card-body">
       <div id="{{ id }}-schema-error" class="alert alert-danger" style="display: none; white-space: pre-line;"></div>
@@ -53,9 +53,9 @@
       </div>
     </div>
     <div class="card-footer sticky-footer">
-      <button class="btn btn-primary formsubmit save_btn" type="submit" name="save" formnovalidate form="{{ id }}-metaForm" {% if edit_allowed == 'false' %}hidden{% else %}disabled{% endif %}>Save</button>
+      <button class="btn btn-primary formsubmit {{ id }}-save_btn" type="submit" name="save" id="{{ id }}-save_btn" formnovalidate form="{{ id }}-metaForm" {% if edit_allowed == 'false' %}hidden{% endif %}>Save</button>
       <!-- Only display the Continue button for dataset_uploads (never disable!)-->
-      <button class="btn btn-primary formsubmit continue_btn" type="submit" name="continue" form="{{ id }}-metaForm" {% if attribute_type != 'user::schema_in_use::dataset_upload' %}hidden{% else %}enabled{% endif %}>Save & Continue</button>
+      <button class="btn btn-primary formsubmit {{ id }}-continue_btn" type="submit" name="continue" id="{{ id }}-continue_btn" form="{{ id }}-metaForm" {% if prefix == 'user::upload::metadata::' %}enabled{% else %}hidden{% endif %}>Save & Continue</button>
     </div>
   </div>
 </div>
@@ -74,6 +74,14 @@
   let isFormInitialized = false;
   let ignoreCheck = false;
   let uncheckDueToError = false;
+
+  // Define Save button based on class, to ensure en/disabling works.
+  const saveButton = $('#{{ id }}-save_btn');
+  const continueButton = $('#{{ id }}-continue_btn');
+
+  // Initialy disable save and continue  button
+  saveButton.prop('disabled', true);
+  continueButton.prop('disabled', true);
 
   // Warning if form is changed (only when edit allowed)
   function confirmIfChanged() {
@@ -108,18 +116,20 @@
       })
     }).done(function () {
         refreshTable();
-        if (action == 'remove') {
+        if (schema_action == 'remove') {
           selectedSchema = "";
+          saveButton.prop('disabled', true);
+          continueButton.prop("disabled", true);
         }
     });
   }
-  
+
   function refreshTable() {
-      $("#{{ id }}-schemata-table ").bootstrapTable("refresh", {
+      $("#{{ id }}-schemata-table").bootstrapTable("refresh", {
         silent: true
       });
   }
-  
+
     // Error Displaying
   function showSchemaError(message) {
     $('#{{ id }}-schema-error')
@@ -146,15 +156,16 @@
       .map(error => error.stack || error.message || String(error))
       .join('\n');
     error = Array.isArray(error) ? error : [error];
-    
+
     const schemaname = selectedSchema
       ? selectedSchema.split('/').pop()
       : 'unknown';
 
-    $('#{{ id }}-save').prop('disabled', true);
-    
+    saveButton.prop('disabled', true);
+    continueButton.prop("disabled", true);
+
     uncheckDueToError = true;
-    
+
     $('#{{ id }}-schemata-table').bootstrapTable('uncheckBy', {
       field: 'schemapath',
       values: [selectedSchema]
@@ -167,10 +178,10 @@
       errorMessage
     );
   }
-  
+
   // Load the correct schema form when a schema is selected
   const loadSchema = function(schemapath) {
-    
+
     // Remove the currently displayed form immediately
     unmountSchemaForm();
 
@@ -179,7 +190,7 @@
 
     // Reset error-uncheck flag for this new load
     uncheckDueToError = false;
-      
+
     $.ajax({
       method: "GET",
       url: '{{ url_for("metaedit.get_schema_and_data") }}',
@@ -195,7 +206,7 @@
           let schema;
           let uiSchema;
           let data;
-          
+
           // Parse schema
           try {
             schema = JSON.parse(result.schema);
@@ -228,7 +239,15 @@
               '{{ id }}-reactform'
             );
 
-            $('#{{ id }}-save').prop('disabled', false);
+            // enable Save button for prefilled default metadata (there is data in the form)
+            if ("{{ prefix }}" === 'default_metadata::' && Object.keys(data).length > 0) {
+              saveButton.prop('disabled', false);
+            };
+            // enable Save & Continue button for uploads (there is data in the form)
+            if ("{{ prefix }}" === 'user::upload::metadata::' && Object.keys(data).length > 0) {
+              saveButton.prop('disabled', false);
+              continueButton.prop('disabled', false);
+            };
 
           } catch (error) {
             // JSON was valid, but rendering failed
@@ -257,7 +276,8 @@
           // Display the error LAST
           showSchemaError(message);
 
-          $('#{{ id }}-save').prop('disabled', true);
+          saveButton.prop('disabled', true);
+          continueButton.prop("disabled", true);
         }
     })
   }
@@ -273,7 +293,7 @@
     isFormInitialized = false;
     hideSchemaError();
   };
-  
+
 
   // Install bootstraptable event handlers
   $('#{{ id }}-schemata-table').bootstrapTable({
@@ -314,11 +334,12 @@
         // Automatic uncheck caused by a schema error
         if (uncheckDueToError && !row.schema_has_data) {
           uncheckDueToError = false;
+
           toggleRow(row.schemapath, 'remove');
           $('#{{ id }}-schemata-table tr').removeClass('highlight');
           return;
         }
-        
+
         // Warning that metadata is deleted due to error ( Error is displayed, metadata remains)
         if (uncheckDueToError && row.schema_has_data ) {
           ignoreCheck = true;
@@ -328,7 +349,7 @@
           });
           return;
         }
-              
+
         // Warning that metadata will be deleted (Only if data is changed, )
         if (isFormChanged || row.schema_has_data) {
           const selectedSchemaName = selectedSchema.match(/\/([^/]+)\.json$/)?.[1];
@@ -343,13 +364,13 @@
             return;
           }
         };
-        
+
         // Uncheck row, if no error occured, and no metadata will be deleted
         toggleRow(row.schemapath, 'remove');
         if (selectedSchema == row.schemapath) {
           unmountSchemaForm();
         }
-        
+
       {% endif %}
     }
   })
@@ -360,13 +381,14 @@
   function afterFormInit() {
     isFormInitialized = true;
     isFormChanged = false;
-    
+
     // Disable form entries when editing is not allowed
     {% if edit_allowed == 'false' %}
       setTimeout(function () {
         const frm = $("#{{ id }}-metaForm");
+        saveButton.prop("disabled", true);
         frm.find("input, select, textarea, button").prop("disabled", true);
-        frm.find("a").addClass("disabled-link"); 
+        frm.find("a").addClass("disabled-link");
       } , 50);
     {% endif %}
   }
@@ -382,7 +404,8 @@
             // Mark the form as changed
             isFormChanged = true;
             // Enable the Save button
-            $('.save_btn').removeAttr('disabled');
+            saveButton.prop("disabled", false);
+            continueButton.prop("disabled", false);
           },
       onSubmit: formSubmit,
       onError: log("Form errors:"),
@@ -410,7 +433,7 @@
       schemapath: selectedSchema,
       prefix: "{{ prefix }}",
       action: formaction
-    },   
+    },
     // store metadata
     showSpinner();
     $.ajax({
@@ -419,10 +442,11 @@
     contentType: "application/json; charset=utf-8",
     dataType: "json",
     data: JSON.stringify(data),
-    success: function () {     
+    success: function () {
       // disable Save button
-      $('.save_btn').prop("disabled", true);
-      isFormChanged = false; // Clear changed-flag
+      saveButton.prop("disabled", true);
+      // Clear changed-flag
+      isFormChanged = false;
       refreshTable();
       if (formaction === 'continue') {
         window.location.replace('{{ url_for("upload.upload_data", coll=collection) }}');
