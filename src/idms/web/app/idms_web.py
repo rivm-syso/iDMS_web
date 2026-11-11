@@ -30,6 +30,9 @@ from .menu_manager import menu_manager
 from .action_manager import action_manager
 from idms.web.app.features import FEATURES
 from idms.web.app.utils.workdir import init_workdir
+from idms.common.constants import (
+    ATTR_DATASET_LEVEL
+)
 
 # This is the default log config. It can (and should) be overruled by
 # setting LOGCONFIG in config.py
@@ -171,6 +174,11 @@ def create_app():
     @login_manager.user_loader
     def load_user(userid):
         return WebUser.retrieve(userid)
+    
+    @app.context_processor
+    def inject_constants():
+        attrs = ["ATTR_DATASET_LEVEL"]
+        return { attr: globals()[attr] for attr in attrs  }
 
     @app.context_processor
     def inject_menu():

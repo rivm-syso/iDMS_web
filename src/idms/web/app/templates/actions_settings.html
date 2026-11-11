@@ -58,6 +58,10 @@
       {{ override_checkbox("object_ids", coll_state.object_ids, "sys::rules::object_ids") }}
     </tr>
     <tr>
+      <th>Dataset Collection Level</th>
+      {{ override_number("dataset_level", coll_state.dataset_level, ATTR_DATASET_LEVEL) }}
+    </tr>    
+    <tr>
       <th>Copies stored</th>
       {{ override_number("min_copies", coll_state.min_copies, "sys::archive::min_copies") }}
     </tr>
@@ -92,7 +96,7 @@
     }, function (data) {
       $('#override_' + switch_id).prop('checked', data.override);
       $('#' + switch_id).prop('disabled', !data.override);
-      $('#' + switch_id).val(data.value ?? 0);
+      $('#' + switch_id).val(data.value ?? "");
       $('#base_' + switch_id).html(data.override ? '' : data.source)
     })
   }

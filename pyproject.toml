@@ -41,7 +41,7 @@ dependencies = [
    "werkzeug",
    "idms-common-irods>=0.0.9",
    "idms-common-filesys>=0.0.3",
-   "idms-common-constants>=0.0.5"
+   "idms-common-constants>=0.0.14"
 ]
 
 [project.optional-dependencies]
