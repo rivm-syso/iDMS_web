@@ -50,6 +50,7 @@ from idms.common.constants.attribute_names import (
     ATTR_ARCHIVE_STATE,
     ATTR_DATAOBJECTID,
     ATTR_DATASETID,
+    ATTR_DATASET_LEVEL,
     ATTR_METADATA_PREFIX,
     ATTR_PIPELINE_INPUT_COLLECTION_ID,
     ATTR_PROJECTID,
@@ -413,6 +414,10 @@ class CollectionState():
         if dataset is None:
             return datafield('collection', 'Not in a dataset', Datatypes.TEXT)
         return datafield('collection', dataset, Datatypes.IRODS_COLLECTION)
+    
+    @property
+    def dataset_level(self):
+        return getmetatree(self.collection, ATTR_DATASET_LEVEL)
 
     @cached_property
     def desired_state(self):
