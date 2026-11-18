@@ -39,9 +39,9 @@ dependencies = [
    "jsonschema",
    "irods_avu_json",
    "werkzeug",
-   "idms-common-irods>=0.0.9",
-   "idms-common-filesys>=0.0.3",
-   "idms-common-constants>=0.0.14"
+   "idms-common-irods==0.0.10",
+   "idms-common-filesys==0.0.3",
+   "idms-common-constants==0.0.14"
 ]
 
 [project.optional-dependencies]
