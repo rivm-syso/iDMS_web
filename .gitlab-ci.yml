@@ -1,6 +1,6 @@
 stages:
   - test
-  - commit_history
+#  - commit_history
   - build
   - internal_publish
   - release_publish
