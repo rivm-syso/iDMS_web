@@ -59,5 +59,12 @@ docs = [
 where = ["src"]
 include = ["idms*"]
 
+[tool.setuptools_scm]
+# 1. Bump the patch version when commits exist past the tag
+version_scheme = "python-simplified-semver"
+
+# 2. Drop the local hash + timestamp (+g5c3506c0f.d20261026)
+local_scheme = "no-local-version"
+
 [project.scripts]
 idms-web = "idms.web.wsgi:main"
